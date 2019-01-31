@@ -1,0 +1,7 @@
+*.json
+*.png
+*.jpg
+*.csv
+
+# PyCharm
+*.idea
