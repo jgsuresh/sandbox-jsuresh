@@ -7,7 +7,8 @@ from dtk.tools.climate.ClimateGenerator import ClimateGenerator
 
 from dtk.utils.core.DTKConfigBuilder import DTKConfigBuilder
 from dtk.utils.reports import add_vector_migration_report
-from malaria.reports.MalariaReport import add_summary_report, add_filtered_spatial_report, add_event_counter_report
+from malaria.reports.MalariaReport import add_summary_report, add_filtered_spatial_report, add_event_counter_report, \
+    add_filtered_report
 from simtools.ModBuilder import ModFn, ModBuilder
 from simtools.SetupParser import SetupParser
 
@@ -17,7 +18,7 @@ from rcd_smallscale_sims.organize_sims import draw_from_burnin_using_vector_habs
 
 SetupParser.default_block = "HPC"
 from simtools.ExperimentManager.ExperimentManagerFactory import ExperimentManagerFactory
-from simtools.Utilities.Experiments import retrieve_simulation
+from simtools.Utilities.Experiments import retrieve_simulation, retrieve_experiment
 from simtools.Utilities.COMPSUtilities import create_suite
 
 
@@ -35,8 +36,10 @@ def add_standard_reports(cb):
                           "Received_Campaign_Drugs"]
     })
 
-    # Turn off InsetChart
+    # Replace InsetChart with a filtered report
     cb.update_params({"Enable_Default_Reporting": 0})
+    add_filtered_report(cb, start=365*3, description="Final_Year")
+
 
 def add_testing_reports(cb):
     add_summary_report(cb)
@@ -55,6 +58,13 @@ def add_testing_reports(cb):
     # InsetChart
     cb.update_params({"Enable_Default_Reporting": 1})
 
+# def add_assets(cb, asset_exp_id):
+#     print("retrieving asset experiment")
+#     asset_expt = retrieve_experiment(asset_exp_id)
+#     template_asset = asset_expt.simulations[0].tags
+#     cb.set_exe_collection(template_asset["exe_collection_id"])
+#     cb.set_dll_collection(template_asset["dll_collection_id"])
+#     cb.set_input_collection(template_asset["input_collection_id"])
 
 
 
@@ -65,16 +75,15 @@ duration = 4*365
 num_seeds = 100
 vector_migration_values = np.array([10])
 healthseeking_on = True
-rcd_on = True
-rcd_delivery_method = "MDA"
+rcd_on = False
+rcd_delivery_method = "MTAT"
 testing = False
 draw_from_burnins = True
 chw_followups_per_month = 4
 budget_followups_by_week = True
-exp_name = "smallscale_RCD_4followups_weeklybudget_MDA"
-
-
-
+exp_name = "smallscale_HS_sweep_no_RCD"
+# asset_exp_id = "88afbd76-8d62-ea11-a2c5-c4346bcb1550"
+asset_collection_id = "49b76c38-f562-ea11-a2c5-c4346bcb1550"
 
 if testing:
     priority = "Highest"
@@ -84,6 +93,8 @@ else:
     coreset = "emod_abcd"
 
 cb = build_project_cb(simulation_duration_days=duration)
+# add_assets(cb, asset_exp_id)
+cb.set_collection_id(asset_collection_id)
 
 # f_sc_array = np.array([7.6, 7.7, 7.8, 7.9, 8.0])
 f_sc_array = np.arange(6.65,8,0.01)
@@ -115,6 +126,11 @@ modlists = []
 # new_modlist = [ModFn(rcd_followthrough, coverage, delivery_method)
 #                for coverage in [1]
 #                for delivery_method in ["MTAT", "MDA"]]
+# modlists.append(new_modlist)
+
+
+# print("Sweeping over health-seeking rates")
+# new_modlist = [ModFn(add_simple_hs, coverage) for coverage in [0.8, 1.0]]
 # modlists.append(new_modlist)
 
 if num_seeds > 1:

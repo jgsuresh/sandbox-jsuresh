@@ -63,6 +63,9 @@ def add_simple_hs(cb, u5_hs_rate, o5_hs_rate=-1):
                        drug=['Artemether', 'Lumefantrine'],
                        dosing='FullTreatmentNewDetectionTech')
 
+    return {"u5_hs_rate": u5_hs_rate,
+            "o5_hs_rate": o5_hs_rate}
+
 
 
 def chw_rcd_manager(cb, followups_per_month=5,rcd_coverage=1, budget_followups_by_week=False):

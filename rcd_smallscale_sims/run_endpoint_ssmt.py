@@ -13,13 +13,13 @@ from simtools.AssetManager.FileList import FileList
 # exp_id = "19fd776e-305b-ea11-a2c5-c4346bcb1550" # fiducial from burnins
 # start_time = 0
 
-exp_id = "78e2f7f5-7f5d-ea11-a2c5-c4346bcb1550"
-start_time = 0
+exp_id = "5a2c10c0-0163-ea11-a2c5-c4346bcb1550"
+# start_time = 0
 
 # ===================================================================================
 
 wi_name = "rcd_endpoints"
-command = "python get_endpoints.py {} {}".format(exp_id, start_time)
+command = "python get_endpoints.py {}".format(exp_id)
 user_files = FileList(root='ssmt_endpoint',files_in_root=['get_endpoints.py'])
 
 if __name__ == "__main__":

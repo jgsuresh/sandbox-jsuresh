@@ -11,8 +11,9 @@ from simtools.Utilities.Experiments import retrieve_experiment
 
 
 class SaveEndpoint(BaseAnalyzer):
-    def __init__(self, save_file=None,start_time_step=0, include_counter_report=False):
-        filenames = ['output/InsetChart.json']
+    def __init__(self, save_file=None,start_time_step=0, include_counter_report=False, output_filename="InsetChart.json"):
+        # filenames = ['output/InsetChart.json']
+        filenames = ['output/{}'.format(output_filename)]
         if include_counter_report:
             filenames.append('output/ReportEventCounter.json')
         super().__init__(filenames=filenames)
@@ -29,19 +30,20 @@ class SaveEndpoint(BaseAnalyzer):
         prev = np.array([])
 
 
-        for j in range(4):
-            s = j*365  + self.start_time_step
-            e = (j+1)*365 + self.start_time_step
-            cases_array = np.array(data[self.filenames[0]]["Channels"]["New Clinical Cases"]["Data"][s:e])
-            infec_array = np.array(data[self.filenames[0]]["Channels"]["New Infections"]["Data"][s:e])
-            EIR_array = np.array(data[self.filenames[0]]["Channels"]["Daily EIR"]["Data"][s:e])
-            RDT_prev_arr = np.array(data[self.filenames[0]]["Channels"]["Blood Smear Parasite Prevalence"]["Data"][s:e])
+        j = 0
+        # for j in range(4):
+        s = j*365  + self.start_time_step
+        e = (j+1)*365 + self.start_time_step
+        cases_array = np.array(data[self.filenames[0]]["Channels"]["New Clinical Cases"]["Data"][s:e])
+        infec_array = np.array(data[self.filenames[0]]["Channels"]["New Infections"]["Data"][s:e])
+        EIR_array = np.array(data[self.filenames[0]]["Channels"]["Daily EIR"]["Data"][s:e])
+        RDT_prev_arr = np.array(data[self.filenames[0]]["Channels"]["Blood Smear Parasite Prevalence"]["Data"][s:e])
 
-            y = np.append(y,j)
-            cases = np.append(cases, np.sum(cases_array))
-            infections = np.append(infections, np.sum(infec_array))
-            EIR = np.append(EIR, np.sum(EIR_array))
-            prev = np.append(prev, np.average(RDT_prev_arr))
+        y = np.append(y,j)
+        cases = np.append(cases, np.sum(cases_array))
+        infections = np.append(infections, np.sum(infec_array))
+        EIR = np.append(EIR, np.sum(EIR_array))
+        prev = np.append(prev, np.average(RDT_prev_arr))
 
         if self.include_counter_report:
             received_treatment = np.array([])
@@ -49,18 +51,19 @@ class SaveEndpoint(BaseAnalyzer):
             received_RCD_drugs = np.array([])
             received_campaign_drugs = np.array([])
 
-            for j in range(4):
-                s = j * 365 + self.start_time_step
-                e = (j + 1) * 365 + self.start_time_step
-                received_treatment_array = np.array(data[self.filenames[1]]["Channels"]["Received_Treatment"]["Data"][s:e])
-                received_test_array = np.array(data[self.filenames[1]]["Channels"]["Received_Test"]["Data"][s:e])
-                received_RCD_drugs_array = np.array(data[self.filenames[1]]["Channels"]["Received_RCD_Drugs"]["Data"][s:e])
-                received_campaign_drugs_array = np.array(data[self.filenames[1]]["Channels"]["Received_Campaign_Drugs"]["Data"][s:e])
+            j = 0
+            # for j in range(4):
+            s = j * 365 + self.start_time_step
+            e = (j + 1) * 365 + self.start_time_step
+            received_treatment_array = np.array(data[self.filenames[1]]["Channels"]["Received_Treatment"]["Data"][s:e])
+            received_test_array = np.array(data[self.filenames[1]]["Channels"]["Received_Test"]["Data"][s:e])
+            received_RCD_drugs_array = np.array(data[self.filenames[1]]["Channels"]["Received_RCD_Drugs"]["Data"][s:e])
+            received_campaign_drugs_array = np.array(data[self.filenames[1]]["Channels"]["Received_Campaign_Drugs"]["Data"][s:e])
 
-                received_treatment = np.append(received_treatment, np.sum(received_treatment_array))
-                received_test = np.append(received_test, np.sum(received_test_array))
-                received_RCD_drugs = np.append(received_RCD_drugs, np.sum(received_RCD_drugs_array))
-                received_campaign_drugs = np.append(received_campaign_drugs, np.sum(received_campaign_drugs_array))
+            received_treatment = np.append(received_treatment, np.sum(received_treatment_array))
+            received_test = np.append(received_test, np.sum(received_test_array))
+            received_RCD_drugs = np.append(received_RCD_drugs, np.sum(received_RCD_drugs_array))
+            received_campaign_drugs = np.append(received_campaign_drugs, np.sum(received_campaign_drugs_array))
 
         sim_data = {
             "year": y,
@@ -100,12 +103,13 @@ if __name__ == "__main__":
     SetupParser.init()
 
     exp_id = sys.argv[1]
-    start_time_step = int(sys.argv[2])
+    # start_time_step = int(sys.argv[2])
 
     am = AnalyzeManager()
     am.add_analyzer(SaveEndpoint(save_file="endpoints_{}.csv".format(exp_id),
-                                 start_time_step=start_time_step,
-                                 include_counter_report=True))
+                                 # start_time_step=start_time_step,
+                                 include_counter_report=True,
+                                 output_filename="ReportMalariaFilteredFinal_Year.json"))
     exp = retrieve_experiment(exp_id)
     am.add_experiment(exp)
     am.analyze()
