@@ -16,7 +16,7 @@ def generate_burnins_sim_map(exp_name="smallscale_RCD_burnins", sim_map_filename
     # Create simulation directory map of burnins
 
     analyzer_list = [SimulationDirectoryMapAnalyzer(save_file=sim_map_filename)]
-    am = AnalyzeManager()
+    am = AnalyzeManager(force_analyze=True)
     # exp = DataStore.get_most_recent_experiment(id_or_name=exp_name) #only seems to work if db.sqlite is OK
     exp = retrieve_experiment(exp_name)
     am.add_experiment(exp)
@@ -43,7 +43,7 @@ def draw_from_burnin_using_vector_habs(cb, f_sc, a_sc):
     return tag_dict
 
 
-def find_burnin_sim_id_for_funest_hab(funest_hab, burnin_sim_map_filepath="burnins_sim_map_finescale_all.csv"):
+def find_burnin_sim_id_for_funest_hab(funest_hab, burnin_sim_map_filepath="output/burnins_sim_map_20200317.csv"):
     burnin_sim_map = pd.read_csv(burnin_sim_map_filepath)
     if "Run_Number" in burnin_sim_map:
         burnin_sim_map = burnin_sim_map[burnin_sim_map["Run_Number"]==0]
@@ -63,4 +63,4 @@ if __name__=="__main__":
     from COMPS import Client
     Client.login(hoststring="https://comps.idmod.org")
 
-    generate_burnins_sim_map(sim_map_filename="burnins_sim_map_finescale_v3.csv", exp_name="3726ab91-a75c-ea11-a2c5-c4346bcb1550")
+    generate_burnins_sim_map(sim_map_filename="burnins_sim_map_20200317.csv", exp_name="a9fbc42e-7368-ea11-a2c5-c4346bcb1550")

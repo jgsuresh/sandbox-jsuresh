@@ -81,7 +81,7 @@ def chw_rcd_manager(cb, followups_per_month=5,rcd_coverage=1, budget_followups_b
 
     if budget_followups_by_week:
         days_between_shipments = 7
-        amount_in_shipment = int(round(followups_per_month * 7/30))
+        amount_in_shipment = int(round(followups_per_month * 7/28))
         max_stock = amount_in_shipment
     else:
         days_between_shipments = 30
@@ -158,6 +158,6 @@ def rcd_followthrough(cb, coverage=1, delivery_method="MTAT"):
         #                       target_residents_only: int = 1,
         #                       check_eligibility_at_trigger: bool = False):
 
-        return {"delivery_method": delivery_method,
-                "coverage": coverage}
+    return {"delivery_method": delivery_method,
+            "coverage": coverage}
 

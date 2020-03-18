@@ -15,7 +15,7 @@ default_sim_duration = 365*5
 
 def get_project_folder():
     dropbox_folder = get_dropbox_location()
-    project_folder = os.path.join(dropbox_folder, "projects/Zambia/rcd_clustering_and_impact/")
+    project_folder = os.path.join(dropbox_folder, "projects/Zambia/rcd_clustering_and_impact_jsuresh/sims/")
     return project_folder
 
 def build_project_cb(simulation_duration_days=default_sim_duration):
