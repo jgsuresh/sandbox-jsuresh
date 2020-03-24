@@ -68,7 +68,7 @@ def add_simple_hs(cb, u5_hs_rate, o5_hs_rate=-1):
 
 
 
-def chw_rcd_manager(cb, followups_per_month=5,rcd_coverage=1, budget_followups_by_week=False):
+def chw_rcd_manager(cb, followups_per_month=5, budget_followups_by_week=False):
     # CHW manager.  Triggered by Received_Treatment events with probability trigger_coverage, and allocates interventions if they are in stock.
     # The intervention in this case is to broadcast "Diagnostic_Survey_0" to the parent node, requesting an MSAT.
     # Note that this setup **should** be able to see all of the nodes, and have a single stock.
@@ -106,7 +106,7 @@ def chw_rcd_manager(cb, followups_per_month=5,rcd_coverage=1, budget_followups_b
     cb.add_event(chw_event)
 
 
-def rcd_followthrough(cb, coverage=1, delivery_method="MTAT"):
+def rcd_followthrough(cb, followup_sweep_coverage=1, delivery_method="MTAT"):
     # Listen for Diagnostic_Survey_0 and implement a diagnostic survey, then broadcast TestedPositive or TestedNegative.
     # Then, if TestedPositive, then administer drugs and broadcast Received_RCD_Drugs
 
@@ -125,7 +125,7 @@ def rcd_followthrough(cb, coverage=1, delivery_method="MTAT"):
 
     if delivery_method == "MTAT":
         add_diagnostic_survey(cb,
-                              coverage=coverage,
+                              coverage=followup_sweep_coverage,
                               start_day=1,
                               diagnostic_type='BLOOD_SMEAR_PARASITES',
                               diagnostic_threshold=0,
@@ -136,7 +136,7 @@ def rcd_followthrough(cb, coverage=1, delivery_method="MTAT"):
 
     elif delivery_method == "MDA":
         add_drug_campaign(cb,
-                          coverage=coverage,
+                          coverage=followup_sweep_coverage,
                           drug_code=drug_code,
                           start_days=[1],
                           campaign_type="MDA",
@@ -159,5 +159,5 @@ def rcd_followthrough(cb, coverage=1, delivery_method="MTAT"):
         #                       check_eligibility_at_trigger: bool = False):
 
     return {"delivery_method": delivery_method,
-            "coverage": coverage}
+            "coverage": followup_sweep_coverage}
 

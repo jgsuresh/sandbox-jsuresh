@@ -18,7 +18,10 @@ def get_project_folder():
     project_folder = os.path.join(dropbox_folder, "projects/Zambia/rcd_clustering_and_impact_jsuresh/sims/")
     return project_folder
 
-def build_project_cb(simulation_duration_days=default_sim_duration):
+def build_project_cb(simulation_duration_days=default_sim_duration,
+                     vector_migration_on=True,
+                     demo_name="demo_750person_multinode.json",
+                     vector_migration_filename="vector_local_migration.bin"):
     cb = basic_gridded_config_builder()
 
     project_folder = get_project_folder()
@@ -27,23 +30,26 @@ def build_project_cb(simulation_duration_days=default_sim_duration):
     cb.update_params({
         "Num_Cores": 1,
         "Simulation_Duration": simulation_duration_days,
-        "Demographics_Filenames": ["demo.json"],
+        "Demographics_Filenames": [demo_name],
 
         "Climate_Model": "CLIMATE_BY_DATA",
         "Air_Temperature_Filename": "Zambia_30arcsec_air_temperature_daily.bin",
         "Land_Temperature_Filename": "Zambia_30arcsec_air_temperature_daily.bin",
         "Rainfall_Filename": "Zambia_30arcsec_rainfall_daily.bin",
         "Relative_Humidity_Filename": "Zambia_30arcsec_relative_humidity_daily.bin",
-
-        "Migration_Model": "FIXED_RATE_MIGRATION",
-        "Migration_Pattern": "SINGLE_ROUND_TRIPS",
-
-        "Enable_Vector_Migration": 1,
-        "Enable_Vector_Migration_Local": 1,
-        "Vector_Migration_Filename_Local": "vector_local_migration.bin",
-        "Vector_Migration_Modifier_Equation": "LINEAR",
-        "x_Vector_Migration_Local": 1
     })
+
+    if vector_migration_on:
+        cb.update_params({
+            "Migration_Model": "FIXED_RATE_MIGRATION",
+            "Migration_Pattern": "SINGLE_ROUND_TRIPS",
+
+            "Enable_Vector_Migration": 1,
+            "Enable_Vector_Migration_Local": 1,
+            "Vector_Migration_Filename_Local": vector_migration_filename,
+            "Vector_Migration_Modifier_Equation": "LINEAR",
+            "x_Vector_Migration_Local": 1
+        })
 
     cb.set_input_files_root(os.path.join(project_folder, "dtk_simulation_input/"))
 

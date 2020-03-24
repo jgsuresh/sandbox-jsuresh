@@ -234,18 +234,23 @@ def remove_duplicate_columns(df):
 
 
 def run_analyzers_and_save_output(exp_id, years_to_include):
+    include_counter = False
+
     SetupParser.default_block = 'HPC'
     SetupParser.init()
 
     am = AnalyzeManager()
-    analyze_counter = SaveEndpointFromCounter(save_file=None,
-                                              years_to_include=years_to_include)
+    if include_counter:
+        analyze_counter = SaveEndpointFromCounter(save_file=None,
+                                                  years_to_include=years_to_include)
 
     analyze_summary = SaveEndpointFromSummaryReport(save_file=None,
                                                     years_to_include=years_to_include)
 
-    analyzer_list = [analyze_counter,
-                     analyze_summary]
+    analyzer_list = [analyze_summary]
+
+    if include_counter:
+        analyzer_list += [analyze_counter]
 
     for analyzer in analyzer_list:
         am.add_analyzer(analyzer)

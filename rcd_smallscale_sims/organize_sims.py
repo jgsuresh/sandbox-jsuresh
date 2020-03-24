@@ -42,6 +42,19 @@ def draw_from_burnin_using_vector_habs(cb, f_sc, a_sc):
     tag_dict = kariba_ento(cb, f_sc, a_sc)
     return tag_dict
 
+def draw_from_burnin_using_vector_habitats_BENOIT(cb, habitats, serialization_parameters):
+    """
+    Function called in a sweep.
+    - Set the funestus and arabiensis habitat
+    - Set the serialization parameters
+    """
+    funestus_habitat, arabiensis_habitat = habitats
+    kariba_ento(cb, funestus_habitat, arabiensis_habitat)
+    cb.update_params(serialization_parameters)
+    return {"funest": funestus_habitat,
+            "arab": arabiensis_habitat}
+
+
 
 def find_burnin_sim_id_for_funest_hab(funest_hab, burnin_sim_map_filepath="output/burnins_sim_map_20200317.csv"):
     burnin_sim_map = pd.read_csv(burnin_sim_map_filepath)
@@ -55,6 +68,32 @@ def find_burnin_sim_id_for_funest_hab(funest_hab, burnin_sim_map_filepath="outpu
     return sim_id_list[arg_select]
 
 
+def pre_process_burnin(input_file, larval_habitats):
+    """
+    Pre-process the burnin.
+    input file: path to the CSV file containing the sim id, funestus, arabiensis habitats, and path
+    larval_habitats: habitats we want to match simulations to
+    return: dictionary containing (funestus_habitat, arabiensis_habitat) -> {serialization parameters}
+    """
+    burnin_sim_map = pd.read_csv(input_file)
+
+    if "Run_Number" in burnin_sim_map:
+        burnin_sim_map = burnin_sim_map[burnin_sim_map["Run_Number"]==0]
+
+    sim_updates = {}
+
+    for funestus_habitat, arabiensis_habitat in larval_habitats:
+        # Get the simulation path with the closest funestus habitat
+        simulation_path = burnin_sim_map.loc[(burnin_sim_map["funest"]-funestus_habitat).abs().argmin()]["path"]
+        sim_updates[(funestus_habitat, arabiensis_habitat)] = {
+            'Serialized_Population_Path': os.path.join(simulation_path, 'output'),
+            'Serialized_Population_Filenames': ['state-18250.dtk']
+        }
+
+    return sim_updates
+
+
+
 
 #fixme  def draw_from_burnin(arab_hab)
 
@@ -63,4 +102,5 @@ if __name__=="__main__":
     from COMPS import Client
     Client.login(hoststring="https://comps.idmod.org")
 
-    generate_burnins_sim_map(sim_map_filename="burnins_sim_map_20200317.csv", exp_name="a9fbc42e-7368-ea11-a2c5-c4346bcb1550")
+    generate_burnins_sim_map(sim_map_filename="burnins_sim_map_singlenode_20200317.csv",
+                             exp_name="374cd6bf-5c6a-ea11-a2c5-c4346bcb1550")
