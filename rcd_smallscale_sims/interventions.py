@@ -68,7 +68,7 @@ def add_simple_hs(cb, u5_hs_rate, o5_hs_rate=-1):
 
 
 
-def chw_rcd_manager(cb, followups_per_month=5, budget_followups_by_week=False):
+def chw_rcd_manager(cb, days_between_followups=7):
     # CHW manager.  Triggered by Received_Treatment events with probability trigger_coverage, and allocates interventions if they are in stock.
     # The intervention in this case is to broadcast "Diagnostic_Survey_0" to the parent node, requesting an MSAT.
     # Note that this setup **should** be able to see all of the nodes, and have a single stock.
@@ -79,21 +79,12 @@ def chw_rcd_manager(cb, followups_per_month=5, budget_followups_by_week=False):
         Node_Selection_Type=BroadcastEventToOtherNodes_Node_Selection_Type_Enum.DISTANCE_ONLY,
         Max_Distance_To_Other_Nodes_Km=0)
 
-    if budget_followups_by_week:
-        days_between_shipments = 7
-        amount_in_shipment = int(round(followups_per_month * 7/28))
-        max_stock = amount_in_shipment
-    else:
-        days_between_shipments = 30
-        amount_in_shipment = followups_per_month
-        max_stock = followups_per_month
-
     chw = CommunityHealthWorkerEventCoordinator(
         Initial_Amount=1,
         Initial_Amount_Distribution_Type=CommunityHealthWorkerEventCoordinator_Initial_Amount_Distribution_Type_Enum.FIXED_DURATION,
-        Amount_In_Shipment=amount_in_shipment,
-        Days_Between_Shipments=days_between_shipments,
-        Max_Stock=max_stock,
+        Amount_In_Shipment=1,
+        Days_Between_Shipments=days_between_followups,
+        Max_Stock=1,
         Max_Distributed_Per_Day=1,
         Intervention_Config=request_msat_config,
         Trigger_Condition_List=["Received_Treatment"],

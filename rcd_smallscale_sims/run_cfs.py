@@ -89,9 +89,10 @@ def add_testing_reports(cb, spatial_reports_on=True, vector_migration_report_on=
 # Interventions
 def toggle_rcd(cb, rcd_on):
     if rcd_on:
-        chw_rcd_manager(cb, followups_per_month=chw_followups_per_month,
-                        budget_followups_by_week=budget_followups_by_week)
-        rcd_followthrough(cb, followup_sweep_coverage=1, delivery_method=rcd_delivery_method)
+        chw_rcd_manager(cb, days_between_followups=days_between_rcd_followups)
+        rcd_followthrough(cb,
+                          followup_sweep_coverage=rcd_sweep_node_coverage,
+                          delivery_method=rcd_delivery_method)
     return {"rcd_on": rcd_on}
 
 
@@ -107,12 +108,14 @@ if __name__ == "__main__":
     exp_name = "smallscale_MTAT_q1"
     use_asset = False
     running_burnin = False
-    chw_followups_per_week = 1
+    chw_performance = "low"
 
-
-    # CHWs
-    budget_followups_by_week = True
-    chw_followups_per_month = 4*chw_followups_per_week
+    if chw_performance == "high":
+        days_between_rcd_followups = 7
+        rcd_sweep_node_coverage = 1
+    elif chw_performance == "low":
+        days_between_rcd_followups = 9
+        rcd_sweep_node_coverage = 0.2
 
 
     start = 0
@@ -127,7 +130,7 @@ if __name__ == "__main__":
         coreset = "emod_32cores"
         # coreset = "emod_abcd"
     else:
-        priority = "Lowest"
+        priority = "BelowNormal"
         coreset = "emod_abcd"
 
     cb = build_project_cb(simulation_duration_days=duration)
@@ -194,8 +197,10 @@ if __name__ == "__main__":
         modlists.append(new_modlist)
     else:
         print("Implementing RCD WITHOUT sweep")
-        chw_rcd_manager(cb, followups_per_month=chw_followups_per_month, budget_followups_by_week=budget_followups_by_week)
-        rcd_followthrough(cb, followup_sweep_coverage=1, delivery_method=rcd_delivery_method)
+        chw_rcd_manager(cb, days_between_followups=days_between_rcd_followups)
+        rcd_followthrough(cb,
+                          followup_sweep_coverage=rcd_sweep_node_coverage,
+                          delivery_method=rcd_delivery_method)
 
     if sweep_over_healthseeking:
         print("Sweeping over health-seeking rates")

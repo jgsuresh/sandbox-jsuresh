@@ -4,7 +4,7 @@ from simtools.AssetManager.FileList import FileList
 
 
 # Run parameters:
-exp_id = "ef2059d5-f46b-ea11-a2c5-c4346bcb1550"
+exp_id = "0a5f559a-186e-ea11-a2c5-c4346bcb1550"
 years_from_end_to_include = 4
 
 # filename = "InsetChart.json"

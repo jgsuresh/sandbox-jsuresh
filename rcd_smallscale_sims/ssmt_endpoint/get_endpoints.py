@@ -52,7 +52,7 @@ def get_annual_cases_from_summary_report(data_summary, num_years):
     return get_pop_weighted_channel_from_summary_report(data_summary, 'Annual Clinical Incidence by Age Bin', num_years)
 
 def get_severe_cases_from_summary_report(data_summary, num_years):
-    return get_pop_weighted_channel_from_summary_report(data_summary, 'Severe Clinical Incidence by Age Bin', num_years)
+    return get_pop_weighted_channel_from_summary_report(data_summary, 'Annual Severe Incidence by Age Bin', num_years)
 
 def get_annual_EIR_from_summary_report(data_summary, num_years, num_nodes=30):
     aeir = np.array(data_summary['DataByTime']['Annual EIR'][:num_years])
@@ -63,7 +63,6 @@ def get_annual_EIR_from_summary_report(data_summary, num_years, num_nodes=30):
     return aeir
 
 
-
 def get_annual_avg_RDT_prev_from_summary_report(data_summary, num_years):
     pop_by_age_bin = data_summary['DataByTimeAndAgeBins']['Average Population by Age Bin']
     rdtprev_by_age_bin = data_summary['DataByTimeAndAgeBins']['PfPR by Age Bin']
@@ -72,6 +71,36 @@ def get_annual_avg_RDT_prev_from_summary_report(data_summary, num_years):
         np.sum(np.array(rdtprev_by_age_bin[i]) * np.array(pop_by_age_bin[i])) / np.sum(pop_by_age_bin[i]) for i in range(num_years)
     ])
     return rdt_prev
+
+
+def get_average_age_from_summary_report(data_summary, num_years, channel=None):
+    # If channel is None, return average age of population.
+    # Otherwise, return average age from that channel (e.g. Annual Severe Incidence by Age Bin)"
+    age_bins = data_summary['Metadata']['Age Bins']
+
+    if not channel:
+        pop_by_age_bin = data_summary['DataByTimeAndAgeBins']['Average Population by Age Bin']
+        pop_avg_age = np.array([
+            np.sum(np.array(age_bins) * np.array(pop_by_age_bin[i])) /np.sum(pop_by_age_bin[i]) for i in range(num_years)
+        ])
+        return pop_avg_age
+    else:
+        incidence_by_age_bin = data_summary['DataByTimeAndAgeBins'][channel]
+        incidence_avg_age = np.array([
+            np.sum(np.array(age_bins) * np.array(incidence_by_age_bin[i])) /np.sum(incidence_by_age_bin[i]) for i in range(num_years)
+        ])
+        return incidence_avg_age
+
+
+def get_average_age_population(data_summary, num_years):
+    return get_average_age_from_summary_report(data_summary, num_years)
+
+def get_average_age_clinical_cases(data_summary, num_years):
+    return get_average_age_from_summary_report(data_summary, num_years,'Annual Clinical Incidence by Age Bin')
+
+def get_average_age_severe_cases(data_summary, num_years):
+    return get_average_age_from_summary_report(data_summary, num_years,'Annual Severe Incidence by Age Bin')
+
 
 
 class SaveEndpointFromSummaryReport(SaveEndpoint):
@@ -87,16 +116,24 @@ class SaveEndpointFromSummaryReport(SaveEndpoint):
 
         y = np.arange(self.years_to_include)
         cases = get_annual_cases_from_summary_report(data_summary, self.years_to_include)
-        severe_cases = get_annual_cases_from_summary_report(data_summary, self.years_to_include)
+        severe_cases = get_severe_cases_from_summary_report(data_summary, self.years_to_include)
+
         EIR = get_annual_EIR_from_summary_report(data_summary, self.years_to_include, self.num_nodes)
         RDT_prev = get_annual_avg_RDT_prev_from_summary_report(data_summary, self.years_to_include)
+
+        average_age_population = get_average_age_population(data_summary, self.years_to_include)
+        average_age_clinical = get_average_age_clinical_cases(data_summary, self.years_to_include)
+        average_age_severe = get_average_age_severe_cases(data_summary, self.years_to_include)
 
         sim_data = {
             "year": y,
             "cases": cases,
             "severe_cases": severe_cases,
             "EIR": EIR,
-            "avg_RDT_prev": RDT_prev
+            "avg_RDT_prev": RDT_prev,
+            "average_age_population": average_age_population,
+            "average_age_clinical": average_age_clinical,
+            "average_age_severe": average_age_severe,
         }
 
 
@@ -234,7 +271,7 @@ def remove_duplicate_columns(df):
 
 
 def run_analyzers_and_save_output(exp_id, years_to_include):
-    include_counter = False
+    include_counter = True
 
     SetupParser.default_block = 'HPC'
     SetupParser.init()

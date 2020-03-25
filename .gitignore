@@ -2,6 +2,9 @@
 *.png
 *.jpg
 *.csv
+*.log
+ __pycache__/
+ *.pyc
 
 # PyCharm
 *.idea
