@@ -8,3 +8,6 @@
 
 # PyCharm
 *.idea
+
+# Jupyter
+.ipynb_checkpoints

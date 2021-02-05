@@ -29,13 +29,13 @@ interventions_folder = os.path.join(project_folder, "inputs/grid_csv/")
 
 
 
-def add_simple_hs(cb, u5_hs_rate, o5_hs_rate=-1):
+def add_simple_hs(cb, u5_hs_rate, o5_hs_rate=-1, start_day=1):
 
     if o5_hs_rate == -1:
         o5_hs_rate = u5_hs_rate * 0.5
 
     add_health_seeking(cb,
-                       start_day=1,
+                       start_day=start_day,
                        targets=[{'trigger': 'NewClinicalCase',
                                  'coverage': u5_hs_rate,
                                  'agemin': 0,
