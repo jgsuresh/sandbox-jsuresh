@@ -11,3 +11,5 @@
 
 # Jupyter
 .ipynb_checkpoints
+pareto_biting/__pycache__/
+rcd_smallscale_sims/__pycache__/
